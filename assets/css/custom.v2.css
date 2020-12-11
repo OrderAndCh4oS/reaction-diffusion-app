@@ -1,0 +1,45 @@
+/* Enter any css you need here */
+@media only screen and (min-width: 768px) {
+    .two-thirds {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 66.65%;
+        float: left;
+        padding-left: 0.9625rem;
+        padding-right: 0.9625rem;
+    }
+
+    .five-columns {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 20.0%;
+        float: left;
+        padding-left: 0.9625rem;
+        padding-right: 0.9625rem;
+    }
+
+    .twelve-columns {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 8.0%;
+        float: left;
+        padding-left: 0.9625rem;
+        padding-right: 0.9625rem;
+    }
+}
+
+.btn-info-pad {
+    font-size: 1.00266rem;
+    padding: 0.0625rem 0.25rem;
+    margin: 0.0625rem;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+}
+
+h4, h5, h6 {
+    font-size: 1.166rem;
+}

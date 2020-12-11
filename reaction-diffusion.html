@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Reaction Diffusion</title>
+    <link rel="stylesheet" href="assets/css/styles.v2.min.css">
+    <link rel="stylesheet" href="assets/css/log-slider.v2.css">
+    <link rel="stylesheet" href="assets/css/custom.v2.css">
+    <link rel="stylesheet" href="assets/css/vs2015.css">
+</head>
+<body>
+<div class="feature-box app clearfix">
+    <h3>Demo</h3>
+    <div class="row">
+        <div class="four-columns">
+            <div class="panel panel-default">
+                <div class="row" style="position: relative; height:250px;">
+                    <canvas id="reaction-diffusion-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="four-columns">
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideDiffusionRateA">Diffusion Rate A</label>
+                    <input
+                        type="range" id="SlideDiffusionRateA" class="range-slider" min="0" max="1" value="1" step="0.1"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideDiffusionRateB">Diffusion Rate B</label>
+                    <input
+                        type="range"
+                        id="SlideDiffusionRateB"
+                        class="range-slider"
+                        min="0"
+                        max="1"
+                        value="0.5"
+                        step="0.1"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <button class="btn-info" id="GenerateButton" title="Just another button" type="button">
+                        Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="four-columns">
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideFeedRate">Feed Rate</label>
+                    <input
+                        type="range" id="SlideFeedRate" class="range-slider" min="0" max="0.1" value="0.0545" step="0.0001"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideKillRate">Kill Rate</label>
+                    <input
+                        type="range" id="SlideKillRate" class="range-slider" min="0" max="0.1" value="0.062" step="0.0001"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+        </div>
+        <div class="four-columns">
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideDeltaTime">Delta Time</label>
+                    <input
+                        type="range" id="SlideDeltaTime" class="range-slider" min="0" max="2" value="1" step="0.1"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideIterations">Iterations</label>
+                    <input
+                        type="range" id="SlideIterations" class="range-slider" min="10" max="10000" value="1" step="10"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="assets/js/Chart.min.js"></script>
+<script src="assets/js/log-slider.v2.js"></script>
+<script src="assets/js/app-core.js"></script>
+<script src="apps/reaction-diffusion.v1.js"></script>
+<script src="assets/js/highlight.pack.js"></script>
+</body>
+</html>
+
