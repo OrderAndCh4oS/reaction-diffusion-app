@@ -43,7 +43,17 @@ window.onload = function() {
     Main(true);
 };
 
-//Main() is hard wired as THE place to start calculating when inputs change
+function drawResult(result) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    for(let x = 1; x < result.length - 1; x++) {
+        for(let y = 1; y < result[x].length - 1; y++) {
+            context.fillStyle = `rgb(${result[x][y].a * 255}, ${result[x][y].a * 255}, ${(1 -
+                result[x][y].b) * 255})`;
+            context.fillRect(x, y, 1, 1);
+        }
+    }
+}
+
 //It does no calculations itself, it merely sets them up, sends off variables, gets results and, if necessary, plots them.
 function Main(generate = false) {
     //Save settings every time you calculate, so they're always ready on a reload
@@ -71,14 +81,7 @@ function Main(generate = false) {
             return;
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        for(let x = 1; x < result.length - 1; x++) {
-            for(let y = 1; y < result[x].length - 1; y++) {
-                context.fillStyle = `rgb(0, ${result[x][y].a * 255}, ${(1 - result[x][y].b) *
-                255})`;
-                context.fillRect(x, y, 1, 1);
-            }
-        }
+        drawResult(result);
 
         generateButtonState.setIsGenerating(false);
     }, 50);
@@ -159,11 +162,22 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
         gridFrom = [...gridTo];
     }
 
-    for(let i = 0; i < iterations; i++) {
-        update();
+    function recursiveUpdate(i) {
+        if(i > 0 && i % 100 !== 0) {
+            update();
+            recursiveUpdate(i-1)
+            return;
+        }
+        if(i > 0) {
+            requestAnimationFrame(function() {
+                drawResult(gridFrom);
+                update();
+                recursiveUpdate(i-1)
+            });
+        }
     }
 
-    // generateButtonState.setIsGenerating(false);
+    recursiveUpdate(iterations);
 
     return gridFrom;
 }
