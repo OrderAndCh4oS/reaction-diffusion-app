@@ -5,6 +5,7 @@ let stop = false;
 const generateButtonEl = document.getElementById('GenerateButton');
 const stopButtonEl = document.getElementById('StopButton');
 const iterationTrackerEl = document.getElementById('InputIterations');
+const continueCheckboxEl = document.getElementById('ContinueCheckbox');
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
 canvas.style.width = size + 'px';
@@ -13,6 +14,7 @@ const scale = window.devicePixelRatio;
 canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
+let lastGrid = null;
 
 function makeIterationTracker(element) {
     let iteration = -1;
@@ -94,6 +96,7 @@ function Main(generate = false) {
         feedRate: round(sliders.SlideFeedRate.value, 4),
         killRate: round(sliders.SlideKillRate.value, 4),
         deltaTime: round(sliders.SlideDeltaTime.value, 2),
+        continueFrom: continueCheckboxEl.checked,
         iterations: round(sliders.SlideIterations.value),
         drawEveryNIterations: round(sliders.SlideDrawEveryNIterations.value),
     };
@@ -110,6 +113,8 @@ function Main(generate = false) {
 
             drawResult(result);
 
+            lastGrid = result;
+
             generateButtonState.setIsGenerating(false);
         });
     }, 50);
@@ -118,7 +123,7 @@ function Main(generate = false) {
 //Here's the app calculation
 //The inputs are just the names provided - their order in the curly brackets is unimportant!
 //By convention the input values are provided with the correct units within Main
-async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, iterations, drawEveryNIterations}) {
+async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterations, drawEveryNIterations}) {
 
     const gridWidth = size;
     const gridHeight = size;
@@ -130,10 +135,15 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
         return {a: 1, b: 0};
     }
 
-    let gridFrom = [...Array(gridWidth)].map(
-        (_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
-    let gridTo = [...Array(gridWidth)].map(
-        (_, x) => [...Array(gridHeight)].map((_, y) => ({a: 1, b: 0})));
+    let gridFrom, gridTo;
+
+    if (continueFrom) {
+        gridFrom = lastGrid;
+    } else {
+        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
+    }
+
+    gridTo = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => ({a: null, b: null})));
 
     const killPlusFeed = killRate + feedRate;
 

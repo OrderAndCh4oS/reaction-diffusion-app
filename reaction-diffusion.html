@@ -29,7 +29,7 @@
                 <div class="full-width">
                     <label for="SlideDiffusionRateA">Diffusion Rate A</label>
                     <input
-                        type="range" id="SlideDiffusionRateA" class="range-slider" min="0" max="1" value="1" step="0.1"
+                        type="range" id="SlideDiffusionRateA" class="range-slider" min="0" max="1" value="1" step="0.01"
                         data-type="linear"
                     />
                 </div>
@@ -44,20 +44,29 @@
                         min="0"
                         max="1"
                         value="0.5"
-                        step="0.1"
+                        step="0.01"
                         data-type="linear"
                     />
                 </div>
             </div>
             <div class="row">
-                <div class="full-width">
+                <div class="full-width margin-bottom">
                     <label>Actions</label>
-                    <button class="btn-info" id="GenerateButton" title="Generate Reaction Diffusion" type="button">
-                        Generate
-                    </button>
-                    <button class="btn-info" id="StopButton" title="Stop Reaction Diffusion" type="button">
-                        Stop
-                    </button>
+                    <p>
+                        <button class="btn-info" id="GenerateButton" title="Generate Reaction Diffusion" type="button">
+                            Generate
+                        </button>
+                        <button class="btn-info" id="StopButton" title="Stop Reaction Diffusion" type="button">
+                            Stop
+                        </button>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <div class="checkbox"><input title="Continue from last run" type="checkbox" id="ContinueCheckbox">
+                        Continue Generating
+                    </div>
                 </div>
             </div>
         </div>
