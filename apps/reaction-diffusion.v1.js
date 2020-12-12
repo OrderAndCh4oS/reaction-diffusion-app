@@ -124,7 +124,7 @@ function Main(generate = false) {
 //The inputs are just the names provided - their order in the curly brackets is unimportant!
 //By convention the input values are provided with the correct units within Main
 async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterations, drawEveryNIterations}) {
-
+    console.log('here');
     const gridWidth = size;
     const gridHeight = size;
 
@@ -170,25 +170,25 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
                 const left = y > 0 ? y - 1 : gridFrom[x].length - 1;
                 const right = y < gridFrom[x].length - 1 ? y + 1 : 0;
 
-                let aDiffusion = gridFrom[top][left]['a'] * laplacianMatrix[0][0];
-                aDiffusion += gridFrom[top][y]['a'] * laplacianMatrix[0][1];
-                aDiffusion += gridFrom[top][right]['a'] * laplacianMatrix[0][2];
-                aDiffusion += gridFrom[x][left]['a'] * laplacianMatrix[1][0];
-                aDiffusion += gridFrom[x][y]['a'] * laplacianMatrix[1][1];
-                aDiffusion += gridFrom[x][right]['a'] * laplacianMatrix[1][2];
-                aDiffusion += gridFrom[bottom][left]['a'] * laplacianMatrix[2][0];
-                aDiffusion += gridFrom[bottom][y]['a'] * laplacianMatrix[2][1];
-                aDiffusion += gridFrom[bottom][right]['a'] * laplacianMatrix[2][2];
+                let aDiffusion = gridFrom[top][left].a * laplacianMatrix[0][0];
+                aDiffusion += gridFrom[top][y].a * laplacianMatrix[0][1];
+                aDiffusion += gridFrom[top][right].a * laplacianMatrix[0][2];
+                aDiffusion += gridFrom[x][left].a * laplacianMatrix[1][0];
+                aDiffusion += gridFrom[x][y].a * laplacianMatrix[1][1];
+                aDiffusion += gridFrom[x][right].a * laplacianMatrix[1][2];
+                aDiffusion += gridFrom[bottom][left].a * laplacianMatrix[2][0];
+                aDiffusion += gridFrom[bottom][y].a * laplacianMatrix[2][1];
+                aDiffusion += gridFrom[bottom][right].a * laplacianMatrix[2][2];
 
-                let bDiffusion = gridFrom[top][left]['b'] * laplacianMatrix[0][0];
-                bDiffusion += gridFrom[top][y]['b'] * laplacianMatrix[0][1];
-                bDiffusion += gridFrom[top][right]['b'] * laplacianMatrix[0][2];
-                bDiffusion += gridFrom[x][left]['b'] * laplacianMatrix[1][0];
-                bDiffusion += gridFrom[x][y]['b'] * laplacianMatrix[1][1];
-                bDiffusion += gridFrom[x][right]['b'] * laplacianMatrix[1][2];
-                bDiffusion += gridFrom[bottom][left]['b'] * laplacianMatrix[2][0];
-                bDiffusion += gridFrom[bottom][y]['b'] * laplacianMatrix[2][1];
-                bDiffusion += gridFrom[bottom][right]['b'] * laplacianMatrix[2][2];
+                let bDiffusion = gridFrom[top][left].b * laplacianMatrix[0][0];
+                bDiffusion += gridFrom[top][y].b * laplacianMatrix[0][1];
+                bDiffusion += gridFrom[top][right].b * laplacianMatrix[0][2];
+                bDiffusion += gridFrom[x][left].b * laplacianMatrix[1][0];
+                bDiffusion += gridFrom[x][y].b * laplacianMatrix[1][1];
+                bDiffusion += gridFrom[x][right].b * laplacianMatrix[1][2];
+                bDiffusion += gridFrom[bottom][left].b * laplacianMatrix[2][0];
+                bDiffusion += gridFrom[bottom][y].b * laplacianMatrix[2][1];
+                bDiffusion += gridFrom[bottom][right].b * laplacianMatrix[2][2];
 
                 const a = gridFrom[x][y].a;
                 const b = gridFrom[x][y].b;
@@ -202,6 +202,7 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
 
     return new Promise(resolve => {
         iterationTracker.start();
+
         recursiveUpdate(iterations);
 
         function recursiveUpdate(i) {
@@ -214,11 +215,11 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
             if(i % drawEveryNIterations === 0) {
                 drawResult(gridFrom);
             }
-            requestAnimationFrame(function() {
+            setTimeout(function() {
                 update();
                 iterationTracker.increment();
                 recursiveUpdate(i-1);
-            });
+            }, 0);
         }
     });
 }
