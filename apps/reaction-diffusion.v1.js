@@ -137,7 +137,7 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
 
     let gridFrom, gridTo;
 
-    if (continueFrom) {
+    if (continueFrom && lastGrid) {
         gridFrom = lastGrid;
     } else {
         gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
