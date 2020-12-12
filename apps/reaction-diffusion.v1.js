@@ -16,12 +16,18 @@ context.scale(scale, scale);
 
 function makeIterationTracker(element) {
     let iteration = -1;
+    let startTime;
     return {
         increment: () => {
             iteration++;
-            element.value = iteration;
+            if (iteration % 10 === 0) {
+                const secs = (performance.now() - startTime) / 1000
+                const IPS = iteration / secs
+                element.value = "t=" + secs.toFixed(1) + "s Itn=" + iteration + " IPS=" + IPS.toFixed(1);
+            }
         },
-        reset: () => {
+        start: () => {
+            startTime = performance.now();
             iteration = 0;
             element.value = iteration;
         }
@@ -181,11 +187,11 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
                 gridTo[x][y].b = getB(b, bDiffusion, a);
             }
         }
-        gridFrom = [...gridTo];
+        [gridTo, gridFrom] = [gridFrom, gridTo];
     }
 
     return new Promise(resolve => {
-        iterationTracker.reset();
+        iterationTracker.start();
         recursiveUpdate(iterations);
 
         function recursiveUpdate(i) {
