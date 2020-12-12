@@ -15,7 +15,7 @@
 </head>
 <body>
 <div class="feature-box app clearfix">
-    <h3>Demo</h3>
+    <h3>Reaction Diffusion</h3>
     <div class="row">
         <div class="four-columns">
             <div class="panel panel-default">
@@ -51,8 +51,12 @@
             </div>
             <div class="row">
                 <div class="full-width">
+                    <label>Actions</label>
                     <button class="btn-info" id="GenerateButton" title="Generate Reaction Diffusion" type="button">
                         Generate
+                    </button>
+                    <button class="btn-info" id="StopButton" title="Stop Reaction Diffusion" type="button">
+                        Stop
                     </button>
                 </div>
             </div>
@@ -62,7 +66,13 @@
                 <div class="full-width">
                     <label for="SlideFeedRate">Feed Rate</label>
                     <input
-                        type="range" id="SlideFeedRate" class="range-slider" min="0" max="0.1" value="0.0545" step="0.0001"
+                        type="range"
+                        id="SlideFeedRate"
+                        class="range-slider"
+                        min="0"
+                        max="0.1"
+                        value="0.0545"
+                        step="0.0001"
                         data-type="linear"
                     />
                 </div>
@@ -71,9 +81,21 @@
                 <div class="full-width">
                     <label for="SlideKillRate">Kill Rate</label>
                     <input
-                        type="range" id="SlideKillRate" class="range-slider" min="0" max="0.1" value="0.062" step="0.0001"
+                        type="range"
+                        id="SlideKillRate"
+                        class="range-slider"
+                        min="0"
+                        max="0.1"
+                        value="0.062"
+                        step="0.0001"
                         data-type="linear"
                     />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <label for="InputIterations">Iterations</label>
+                    <input id="InputIterations" type="text" readonly value="0">
                 </div>
             </div>
         </div>
@@ -91,7 +113,28 @@
                 <div class="full-width">
                     <label for="SlideIterations">Iterations</label>
                     <input
-                        type="range" id="SlideIterations" class="range-slider" min="10" max="10000" value="1" step="10"
+                        type="range"
+                        id="SlideIterations"
+                        class="range-slider"
+                        min="10"
+                        max="10000"
+                        value="100"
+                        step="10"
+                        data-type="linear"
+                    />
+                </div>
+            </div>
+            <div class="row">
+                <div class="full-width">
+                    <label for="SlideDrawEveryNIterations">Draw Every N Iterations</label>
+                    <input
+                        type="range"
+                        id="SlideDrawEveryNIterations"
+                        class="range-slider"
+                        min="1"
+                        max="1000"
+                        value="10"
+                        step="1"
                         data-type="linear"
                     />
                 </div>

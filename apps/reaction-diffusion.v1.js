@@ -1,8 +1,10 @@
 'use strict';
 
 const size = 250;
-
-const generateButton = document.getElementById('GenerateButton');
+let stop = false;
+const generateButtonEl = document.getElementById('GenerateButton');
+const stopButtonEl = document.getElementById('StopButton');
+const iterationTrackerEl = document.getElementById('InputIterations');
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
 canvas.style.width = size + 'px';
@@ -11,6 +13,22 @@ const scale = window.devicePixelRatio;
 canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
+
+function makeIterationTracker(element) {
+    let iteration = -1;
+    return {
+        increment: () => {
+            iteration++;
+            element.value = iteration;
+        },
+        reset: () => {
+            iteration = 0;
+            element.value = iteration;
+        }
+    }
+}
+
+const iterationTracker = makeIterationTracker(iterationTrackerEl, {suffix: ' Iterations'})
 
 function makeGenerateButtonState(button, defaultInnerHtml, generatingInnerHtml) {
     let isGenerating = false;
@@ -25,7 +43,7 @@ function makeGenerateButtonState(button, defaultInnerHtml, generatingInnerHtml) 
     });
 }
 
-const generateButtonState = makeGenerateButtonState(generateButton, 'Generate',
+const generateButtonState = makeGenerateButtonState(generateButtonEl, 'Generate',
     `Processing<span class="loading"></span>`);
 
 const round = (value, precision) => {
@@ -36,9 +54,12 @@ const round = (value, precision) => {
 //One universal basic required here to get things going once loaded
 window.onload = function() {
     //We need to set up buttons in this onload section
-    generateButton.addEventListener('click', function() {
+    generateButtonEl.addEventListener('click', function() {
         Main(true);
     });
+    stopButtonEl.addEventListener('click', function() {
+        stop = true;
+    })
     restoreDefaultValues(); //Un-comment this if you want to start with defaults
     Main(true);
 };
@@ -68,6 +89,7 @@ function Main(generate = false) {
         killRate: round(sliders.SlideKillRate.value, 4),
         deltaTime: round(sliders.SlideDeltaTime.value, 2),
         iterations: round(sliders.SlideIterations.value),
+        drawEveryNIterations: round(sliders.SlideDrawEveryNIterations.value),
     };
 
     if(!generate) return;
@@ -90,7 +112,7 @@ function Main(generate = false) {
 //Here's the app calculation
 //The inputs are just the names provided - their order in the curly brackets is unimportant!
 //By convention the input values are provided with the correct units within Main
-async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, iterations}) {
+async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, iterations, drawEveryNIterations}) {
 
     const gridWidth = size;
     const gridHeight = size;
@@ -163,24 +185,25 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
     }
 
     return new Promise(resolve => {
-        function recursiveUpdate(i) {
-            if(i > 0 && i % 100 !== 0) {
-                update();
-                recursiveUpdate(i-1)
-                return;
-            }
-            if(i > 0) {
-                requestAnimationFrame(function() {
-                    drawResult(gridFrom);
-                    update();
-                    recursiveUpdate(i-1);
-                });
-                return;
-            }
-            drawResult(gridFrom);
-            resolve(gridFrom);
-        }
+        iterationTracker.reset();
         recursiveUpdate(iterations);
+
+        function recursiveUpdate(i) {
+            if(i <= 0 || stop) {
+                stop = false;
+                drawResult(gridFrom);
+                resolve(gridFrom);
+                return;
+            }
+            if(i % drawEveryNIterations === 0) {
+                drawResult(gridFrom);
+            }
+            requestAnimationFrame(function() {
+                update();
+                iterationTracker.increment();
+                recursiveUpdate(i-1);
+            });
+        }
     });
 }
 
