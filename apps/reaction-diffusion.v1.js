@@ -1,4 +1,8 @@
+'use strict';
+
 const size = 250;
+
+const generateButton = document.getElementById('GenerateButton');
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
 canvas.style.width = size + 'px';
@@ -8,6 +12,22 @@ canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
 
+function makeGenerateButtonState(button, defaultInnerHtml, generatingInnerHtml) {
+    let isGenerating = false;
+    button.innerHTML = defaultInnerHtml;
+    return ({
+        setIsGenerating: (value) => {
+            isGenerating = value;
+            button.innerHTML = isGenerating ? generatingInnerHtml : defaultInnerHtml;
+            button.disabled = isGenerating;
+        },
+        isGenerating,
+    });
+}
+
+const generateButtonState = makeGenerateButtonState(generateButton, 'Generate',
+    `Processing<span class="loading"></span>`);
+
 const round = (value, precision) => {
     const multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
@@ -16,8 +36,9 @@ const round = (value, precision) => {
 //One universal basic required here to get things going once loaded
 window.onload = function() {
     //We need to set up buttons in this onload section
-    const generateButton = document.getElementById('GenerateButton');
-    generateButton.addEventListener('click', function() {Main(true);});
+    generateButton.addEventListener('click', function() {
+        Main(true);
+    });
     restoreDefaultValues(); //Un-comment this if you want to start with defaults
     Main(true);
 };
@@ -39,28 +60,34 @@ function Main(generate = false) {
         iterations: round(sliders.SlideIterations.value),
     };
 
-    //Send inputs off to CalcIt where the names are instantly available
-    //Get all the resonses as an object, result
-    const result = CalcIt(inputs, generate);
+    if(!generate) return;
 
-    if(!result) return;
+    generateButtonState.setIsGenerating(true);
 
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    for(let x = 1; x < result.length - 1; x++) {
-        for(let y = 1; y < result[x].length - 1; y++) {
-            context.fillStyle = `rgb(0, ${result[x][y].a * 255}, ${(1 - result[x][y].b) * 255})`;
-            context.fillRect(x, y, 1, 1);
+    setTimeout(async function() {
+        const result = await CalcIt(inputs);
+
+        if(!result) {
+            return;
         }
-    }
 
-    //You might have some other stuff to do here, but for most apps that's it for Main!
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        for(let x = 1; x < result.length - 1; x++) {
+            for(let y = 1; y < result[x].length - 1; y++) {
+                context.fillStyle = `rgb(0, ${result[x][y].a * 255}, ${(1 - result[x][y].b) *
+                255})`;
+                context.fillRect(x, y, 1, 1);
+            }
+        }
+
+        generateButtonState.setIsGenerating(false);
+    }, 50);
 }
 
 //Here's the app calculation
 //The inputs are just the names provided - their order in the curly brackets is unimportant!
 //By convention the input values are provided with the correct units within Main
-function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, iterations}, generate = false) {
-    if(!generate) return;
+async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, iterations}) {
 
     const gridWidth = size;
     const gridHeight = size;
@@ -90,7 +117,8 @@ function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, 
     }
 
     function getB(b, bDiffusion, a) {
-        return b + (((diffusionRateB * bDiffusion) + (a * b * b)) - ((killPlusFeed) * b)) * deltaTime;
+        return b + (((diffusionRateB * bDiffusion) + (a * b * b)) - ((killPlusFeed) * b)) *
+            deltaTime;
     }
 
     function update() {
@@ -134,6 +162,8 @@ function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, 
     for(let i = 0; i < iterations; i++) {
         update();
     }
+
+    // generateButtonState.setIsGenerating(false);
 
     return gridFrom;
 }
