@@ -74,16 +74,16 @@ function Main(generate = false) {
 
     generateButtonState.setIsGenerating(true);
 
-    setTimeout(async function() {
-        const result = await CalcIt(inputs);
+    setTimeout(function() {
+        CalcIt(inputs).then(result => {
+            if(!result) {
+                return;
+            }
 
-        if(!result) {
-            return;
-        }
+            drawResult(result);
 
-        drawResult(result);
-
-        generateButtonState.setIsGenerating(false);
+            generateButtonState.setIsGenerating(false);
+        });
     }, 50);
 }
 
@@ -96,7 +96,7 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
     const gridHeight = size;
 
     function initGridCellBox(x, y) {
-        if((x >= 40 * 2.5 && x <= 50 * 2.5) && (y >= 40 * 2.5 && y <= 50 * 2.5)) {
+        if((x >= 40 * 2.5 && x <= 60 * 2.5) && (y >= 40 * 2.5 && y <= 60 * 2.5)) {
             return {a: 0, b: 1};
         }
         return {a: 1, b: 0};
@@ -162,23 +162,25 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
         gridFrom = [...gridTo];
     }
 
-    function recursiveUpdate(i) {
-        if(i > 0 && i % 100 !== 0) {
-            update();
-            recursiveUpdate(i-1)
-            return;
-        }
-        if(i > 0) {
-            requestAnimationFrame(function() {
-                drawResult(gridFrom);
+    return new Promise(resolve => {
+        function recursiveUpdate(i) {
+            if(i > 0 && i % 100 !== 0) {
                 update();
                 recursiveUpdate(i-1)
-            });
+                return;
+            }
+            if(i > 0) {
+                requestAnimationFrame(function() {
+                    drawResult(gridFrom);
+                    update();
+                    recursiveUpdate(i-1);
+                });
+                return;
+            }
+            drawResult(gridFrom);
+            resolve(gridFrom);
         }
-    }
-
-    recursiveUpdate(iterations);
-
-    return gridFrom;
+        recursiveUpdate(iterations);
+    });
 }
 
