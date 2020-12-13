@@ -18,7 +18,30 @@ let lastTime = 0;
 let worker = getWorker();
 
 function getWorker() {
-    return new Worker('apps/reaction-diffusion.webworker.v1.js');
+    const worker = new Worker('apps/reaction-diffusion.webworker.v1.js');
+
+    worker.onmessage = function(event) {
+        switch(event.data.type) {
+            case 'iter':
+                iterationTrackerEl.value = event.data.str;
+                break;
+            case 'grid':
+                draw(event.data.grid);
+                lastTime = event.data.currentTime;
+                lastGrid = event.data.grid;
+                break;
+            case 'complete':
+                generateButtonState.setIsGenerating(false);
+                break;
+            case 'message':
+                console.log('Message', event.data.message);
+                break;
+            default:
+                console.log('Unhandled Webworker message type', event);
+        }
+    };
+
+    return worker;
 }
 
 function makeGenerateButtonState(button, defaultInnerHtml, generatingInnerHtml) {
@@ -51,7 +74,7 @@ window.onload = function() {
     });
     stopButtonEl.addEventListener('click', function() {
         worker.terminate();
-        worker = new Worker('apps/reaction-diffusion.webworker.v1.js');
+        worker = getWorker();
         generateButtonState.setIsGenerating(false);
     });
     restoreDefaultValues();
@@ -99,24 +122,4 @@ function CalcIt(data) {
         data,
     });
 }
-
-worker.onmessage = function(event) {
-    switch(event.data.type) {
-        case 'iter':
-            iterationTrackerEl.value = event.data.str;
-            break;
-        case 'grid':
-            draw(event.data.grid);
-            lastTime = event.data.currentTime;
-            lastGrid = event.data.grid;
-            if(event.data.status === 'complete')
-                generateButtonState.setIsGenerating(false);
-            break;
-        case 'message':
-            console.log('Message', event.data.message);
-            break;
-        default:
-            console.log('Unhandled Webworker message type', event);
-    }
-};
 

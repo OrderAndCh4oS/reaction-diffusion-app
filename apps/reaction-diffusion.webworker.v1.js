@@ -1,11 +1,9 @@
 'use strict';
 
-let isRunning = false;
-
 function makeIterationTracker() {
-    let iteration = -1;
     let startTime;
-    let currentTime = 0;
+    let iteration;
+    let currentTime;
     return {
         increment: () => {
             iteration++;
@@ -20,13 +18,16 @@ function makeIterationTracker() {
             }
         },
         start: (continueFromLast, lastTime) => {
+            iteration = 0;
+            currentTime = 0;
             const now = performance.now();
             startTime = continueFromLast ? performance.now() - lastTime : now;
-            iteration = 0;
         },
         get: () => currentTime,
     };
 }
+
+const iterationTracker = makeIterationTracker();
 
 function initGridCellBox(x, y) {
     if((x >= 40 * 2.5 && x <= 60 * 2.5) && (y >= 40 * 2.5 && y <= 60 * 2.5)) {
@@ -37,8 +38,7 @@ function initGridCellBox(x, y) {
 
 function run(eventData) {
     const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, lastTime, lastGrid, iterations, drawEveryNIterations} = eventData;
-
-    const iterationTracker = makeIterationTracker();
+    console.log(eventData);
 
     const laplacian0 = 0.05;
     const laplacian1 = 0.2;
@@ -128,21 +128,11 @@ function run(eventData) {
     }
 
     iterationTracker.start(continueFrom, lastTime);
-    for(let i = iterations; i >= 0; i--) {
-        if(i === 0) {
-            isRunning = false;
-            postMessage({
-                type: 'grid',
-                status: 'complete',
-                currentTime: iterationTracker.get(),
-                grid: gridFrom,
-            });
-            return;
-        }
+
+    for(let i = 0; i < iterations; i++) {
         if(i % drawEveryNIterations === 0) {
             postMessage({
                 type: 'grid',
-                status: 'running',
                 currentTime: iterationTracker.get(),
                 grid: gridFrom,
             });
@@ -150,17 +140,17 @@ function run(eventData) {
         update();
         iterationTracker.increment();
     }
+    postMessage({type: 'complete'});
 }
 
 onmessage = function(event) {
     switch(event.data.type) {
         case 'start':
-            if(!isRunning) {
-                isRunning = true;
-                run(event.data.data);
-            }
+            console.log('start');
+            run(event.data.data);
             break;
         default:
             console.log('Unhandled event type', event);
     }
 };
+
