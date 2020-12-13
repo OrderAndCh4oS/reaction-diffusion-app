@@ -117,7 +117,7 @@ function run(eventData) {
     }
 
     iterationTracker.start(continueFrom, lastTime);
-    for(let i = iterations - 1; i >= 0; i--) {
+    for(let i = iterations; i >= 0; i--) {
         if(i === 0) {
             isRunning = false;
             postMessage({
