@@ -33,6 +33,13 @@ function makeIterationTracker() {
 
 const iterationTracker = makeIterationTracker();
 
+function distanceTo(aX, aY, bX, bY) {
+    const dX = aX - bX;
+    const dY = aY - bY;
+
+    return Math.sqrt((dX * dX) + (dY * dY));
+}
+
 function initGridCellBox(size, x, y) {
     if((x >= (size * 0.4) && x <= (size * 0.6)) && (y >= (size * 0.4) && y <= (size * 0.6))) {
         return {a: 0, b: 1};
@@ -40,9 +47,38 @@ function initGridCellBox(size, x, y) {
     return {a: 1, b: 0};
 }
 
+function initGridCellCircle(size, x, y) {
+    const mid = ~~(size * 0.5);
+    const d = distanceTo(mid, mid, x, y);
+    if(d < size * 0.15) {
+        return {a: 0, b: 1};
+    }
+    return {a: 1, b: 0};
+}
+function makeBlobInit(size, count, radius) {
+    const blobs = [];
+    const innerScale = 1 - radius * 2.5;
+    for(let i = 0; i < count; i++) {
+        const x = (Math.random() * ~~(size * innerScale)) + ~~(size * radius);
+        const y = (Math.random() * ~~(size * innerScale)) + ~~(size * radius);
+        blobs.push({x, y});
+    }
+
+    return function initGridCellBlob(size, x, y) {
+        for(const blob of blobs) {
+            const d = distanceTo(blob.x, blob.y, x, y);
+            if(d < size * radius) {
+                return {a: 0, b: 1};
+            }
+        }
+
+        return {a: 1, b: 0};
+    }
+}
+
+
 function run(eventData) {
-    const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterationData, lastGrid, iterations, drawEveryNIterations} = eventData;
-    console.log('size ww', size);
+    const {size, shape, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterationData, lastGrid, iterations, drawEveryNIterations} = eventData;
 
     const laplacian0 = 0.05;
     const laplacian1 = 0.2;
@@ -54,15 +90,39 @@ function run(eventData) {
     const laplacian7 = 0.2;
     const laplacian8 = 0.05;
 
-    const gridWidth = ~~size;
-    const gridHeight = ~~size;
+    const gridWidth = size;
+    const gridHeight = size;
 
     let gridFrom, gridTo;
+    let shapeFunction;
+
+    switch(shape) {
+        case 'box':
+            shapeFunction = initGridCellBox
+            break;
+        case 'circle':
+            shapeFunction = initGridCellCircle
+            break;
+        case 'five-large-blobs':
+            shapeFunction = makeBlobInit(size, 5, 0.125);
+            break;
+        case 'nine-medium-blobs':
+            shapeFunction = makeBlobInit(size, 9, 0.075);
+            break;
+        case 'twelve-small-blobs':
+            shapeFunction = makeBlobInit(size, 12, 0.066);
+            break;
+        case 'fifteen-tiny-blobs':
+            shapeFunction = makeBlobInit(size, 15, 0.04);
+            break;
+        default:
+            throw new Error('Unhandled shape');
+    }
 
     if(continueFrom && lastGrid) {
         gridFrom = lastGrid;
     } else {
-        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(size, x, y)));
+        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => shapeFunction(size, x, y)));
     }
 
     gridTo = [...Array(gridWidth)].map(

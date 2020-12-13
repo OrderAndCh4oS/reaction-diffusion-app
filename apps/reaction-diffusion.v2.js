@@ -4,6 +4,7 @@ const generateButtonEl = document.getElementById('GenerateButton');
 const stopButtonEl = document.getElementById('StopButton');
 const iterationTrackerEl = document.getElementById('InputIterations');
 const continueCheckboxEl = document.getElementById('ContinueCheckbox');
+const shapesSelectEl = document.getElementById('ShapesSelect');
 
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
@@ -34,9 +35,6 @@ function getWorker() {
                 break;
             case 'complete':
                 generateButtonState.setIsGenerating(false);
-                break;
-            case 'message':
-                console.log('Message', event.data.message);
                 break;
             default:
                 console.log('Unhandled Webworker message type', event);
@@ -127,6 +125,7 @@ function Main(generate = false) {
         feedRate: round(sliders.SlideFeedRate.value, 4),
         killRate: round(sliders.SlideKillRate.value, 4),
         deltaTime: round(sliders.SlideDeltaTime.value, 2),
+        shape: shapesSelectEl.value,
         continueFrom: continueCheckboxEl.checked,
         iterations: round(sliders.SlideIterations.value),
         drawEveryNIterations: round(sliders.SlideDrawEveryNIterations.value),
