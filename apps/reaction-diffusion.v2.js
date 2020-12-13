@@ -1,6 +1,5 @@
 'use strict';
 
-const size = 250;
 const generateButtonEl = document.getElementById('GenerateButton');
 const stopButtonEl = document.getElementById('StopButton');
 const iterationTrackerEl = document.getElementById('InputIterations');
@@ -8,14 +7,13 @@ const continueCheckboxEl = document.getElementById('ContinueCheckbox');
 
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
-canvas.style.width = size + 'px';
-canvas.style.height = size + 'px';
-const scale = window.devicePixelRatio;
+let size = canvas.clientWidth;
+let scale = window.devicePixelRatio;
 canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
-const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-const data = new Uint32Array(imageData.data.buffer);
+let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+let data = new Uint32Array(imageData.data.buffer);
 
 let lastGrid = null;
 let iterationData = 0;
@@ -83,6 +81,19 @@ window.onload = function() {
     restoreDefaultValues();
     Main(true);
 };
+
+window.onresize = function() {
+    if(worker) worker.terminate();
+    generateButtonState.setIsGenerating(false);
+    lastGrid = null;
+    scale = window.devicePixelRatio;
+    size = canvas.clientWidth;
+    canvas.width = size * scale;
+    canvas.height = size * scale;
+    context.scale(scale, scale);
+    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    data = new Uint32Array(imageData.data.buffer);
+}
 
 function draw(result) {
     let count = 0;

@@ -33,8 +33,8 @@ function makeIterationTracker() {
 
 const iterationTracker = makeIterationTracker();
 
-function initGridCellBox(x, y) {
-    if((x >= 40 * 2.5 && x <= 60 * 2.5) && (y >= 40 * 2.5 && y <= 60 * 2.5)) {
+function initGridCellBox(size, x, y) {
+    if((x >= (size * 0.4) && x <= (size * 0.6)) && (y >= (size * 0.4) && y <= (size * 0.6))) {
         return {a: 0, b: 1};
     }
     return {a: 1, b: 0};
@@ -42,6 +42,7 @@ function initGridCellBox(x, y) {
 
 function run(eventData) {
     const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterationData, lastGrid, iterations, drawEveryNIterations} = eventData;
+    console.log('size ww', size);
 
     const laplacian0 = 0.05;
     const laplacian1 = 0.2;
@@ -53,15 +54,15 @@ function run(eventData) {
     const laplacian7 = 0.2;
     const laplacian8 = 0.05;
 
-    const gridWidth = size;
-    const gridHeight = size;
+    const gridWidth = ~~size;
+    const gridHeight = ~~size;
 
     let gridFrom, gridTo;
 
     if(continueFrom && lastGrid) {
         gridFrom = lastGrid;
     } else {
-        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
+        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(size, x, y)));
     }
 
     gridTo = [...Array(gridWidth)].map(
