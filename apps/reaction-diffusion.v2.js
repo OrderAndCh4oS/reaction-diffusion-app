@@ -5,6 +5,7 @@ const generateButtonEl = document.getElementById('GenerateButton');
 const stopButtonEl = document.getElementById('StopButton');
 const iterationTrackerEl = document.getElementById('InputIterations');
 const continueCheckboxEl = document.getElementById('ContinueCheckbox');
+
 const canvas = document.getElementById('reaction-diffusion-canvas');
 const context = canvas.getContext('2d');
 canvas.style.width = size + 'px';
@@ -13,9 +14,13 @@ const scale = window.devicePixelRatio;
 canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
+const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+const imageArr = imageData.data;
+
+
 let lastGrid = null;
 let lastTime = 0;
-let worker = getWorker();
+let worker = null;
 
 function getWorker() {
     const worker = new Worker('apps/reaction-diffusion.webworker.v1.js');
@@ -73,23 +78,33 @@ window.onload = function() {
         Main(true);
     });
     stopButtonEl.addEventListener('click', function() {
-        worker.terminate();
-        worker = getWorker();
         generateButtonState.setIsGenerating(false);
     });
     restoreDefaultValues();
-    Main(true);
 };
 
 function draw(result) {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    for(let x = 1; x < result.length - 1; x++) {
-        for(let y = 1; y < result[x].length - 1; y++) {
-            context.fillStyle = `rgb(${result[x][y].a * 255}, ${result[x][y].a * 255}, ${(1 -
-                result[x][y].b) * 255})`;
-            context.fillRect(x, y, 1, 1);
+    let count = 0;
+    for(let x = 0; x < canvas.width; x++) {
+        for(let y = 0; y < canvas.height; y++) { //This is crude code to make the point
+            count++;
+            const resultX = ~~(x/scale); // ~~ bitwise floor
+            const resultY = ~~(y/scale);
+            imageArr[x * canvas.width + y] = result[resultX][resultY].a * 255;
+            imageArr[x * canvas.width + y + 1] = result[resultX][resultY].a * 255;
+            imageArr[x * canvas.width + y + 2] = (1 - result[resultX][resultY].b) * 255;
+            imageArr[x * canvas.width + y + 3] = 255; //The alpha channel
         }
     }
+
+    context.putImageData(imageData, 0, 0);
+    // for(let x = 1; x < result.length - 1; x++) {
+    //     for(let y = 1; y < result[x].length - 1; y++) {
+    //         context.fillStyle = `rgb(${result[x][y].a * 255}, ${result[x][y].a * 255}, ${(1 -
+    //             result[x][y].b) * 255})`;
+    //         context.fillRect(x, y, 1, 1);
+    //     }
+    // }
 }
 
 function Main(generate = false) {
@@ -117,6 +132,12 @@ function Main(generate = false) {
 }
 
 function CalcIt(data) {
+    if(!worker) {
+        worker = getWorker();
+    } else {
+        worker.terminate();
+        worker = getWorker();
+    }
     worker.postMessage({
         type: 'start',
         data,

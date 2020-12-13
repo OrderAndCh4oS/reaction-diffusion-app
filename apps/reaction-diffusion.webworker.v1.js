@@ -149,4 +149,3 @@ onmessage = function(event) {
             console.log('Unhandled event type', event);
     }
 };
-
