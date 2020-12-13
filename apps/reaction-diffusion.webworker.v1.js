@@ -38,7 +38,6 @@ function initGridCellBox(x, y) {
 
 function run(eventData) {
     const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, lastTime, lastGrid, iterations, drawEveryNIterations} = eventData;
-    console.log(eventData);
 
     const laplacian0 = 0.05;
     const laplacian1 = 0.2;
@@ -146,7 +145,6 @@ function run(eventData) {
 onmessage = function(event) {
     switch(event.data.type) {
         case 'start':
-            console.log('start');
             run(event.data.data);
             break;
         default:
