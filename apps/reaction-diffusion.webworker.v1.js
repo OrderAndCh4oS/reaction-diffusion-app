@@ -7,19 +7,18 @@ function makeIterationTracker() {
     return {
         increment: () => {
             iterations++;
-            const secs = (performance.now() - startTime) / 1000;
-            currentTime = secs;
             if(iterations % 10 === 0) {
+                const secs = (performance.now() - startTime) / 1000;
+                currentTime = secs;
                 const iterationsPerSec = iterations / secs;
                 postMessage({
                     type: 'iter',
-                    str: `t=${secs.toFixed(1)}s Itn=${iterations} Itn/sec=${iterationsPerSec.toFixed(1)}`,
+                    str: `t=${secs.toFixed(1)}s Itn=${iterations} IPS=${iterationsPerSec.toFixed(1)}`,
                 });
             }
         },
         start: (continueFromLast, iterationData) => {
             if (continueFromLast && iterationData) {
-                console.log(iterationData);
                 iterations = iterationData.iterations;
             } else {
                 iterations = 0;
