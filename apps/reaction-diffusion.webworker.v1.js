@@ -57,23 +57,21 @@ function run(eventData) {
     if(continueFrom && lastGrid) {
         gridFrom = lastGrid;
     } else {
-        gridFrom = [...Array(gridWidth)].map(
-            (_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
+        gridFrom = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => initGridCellBox(x, y)));
     }
 
     gridTo = [...Array(gridWidth)].map(
-        (_, x) => [...Array(gridHeight)].map((_, y) => ({a: null, b: null})));
+        (_, x) => [...Array(gridHeight)].map((_, y) => ({a: null, b: null}))
+    );
 
     const killPlusFeed = killRate + feedRate;
 
     function getA(a, aDiffusion, b) {
-        return a + ((diffusionRateA * aDiffusion) - (a * b * b) + (feedRate * (1 - a))) *
-            deltaTime;
+        return a + ((diffusionRateA * aDiffusion) - (a * b * b) + (feedRate * (1 - a))) * deltaTime;
     }
 
     function getB(b, bDiffusion, a) {
-        return b + (((diffusionRateB * bDiffusion) + (a * b * b)) - ((killPlusFeed) * b)) *
-            deltaTime;
+        return b + (((diffusionRateB * bDiffusion) + (a * b * b)) - ((killPlusFeed) * b)) * deltaTime;
     }
 
     function update() {
@@ -141,9 +139,10 @@ function run(eventData) {
 }
 
 onmessage = function(event) {
+    const data = JSON.parse(event.data.data)
     switch(event.data.type) {
         case 'start':
-            run(event.data.data);
+            run(data);
             break;
         default:
             console.log('Unhandled event type', event);
