@@ -2,28 +2,33 @@
 
 function makeIterationTracker() {
     let startTime;
-    let iteration;
+    let iterations;
     let currentTime;
     return {
         increment: () => {
-            iteration++;
-            if(iteration % 10 === 0) {
-                const secs = (performance.now() - startTime) / 1000;
-                currentTime = secs;
-                const iterationsPerSec = iteration / secs;
+            iterations++;
+            const secs = (performance.now() - startTime) / 1000;
+            currentTime = secs;
+            if(iterations % 10 === 0) {
+                const iterationsPerSec = iterations / secs;
                 postMessage({
                     type: 'iter',
-                    str: `t=${secs.toFixed(1)}s Itn=${iteration} IPS=${iterationsPerSec.toFixed(1)}`,
+                    str: `t=${secs.toFixed(1)}s Itn=${iterations} Itn/sec=${iterationsPerSec.toFixed(1)}`,
                 });
             }
         },
-        start: (continueFromLast, lastTime) => {
-            iteration = 0;
+        start: (continueFromLast, iterationData) => {
+            if (continueFromLast && iterationData) {
+                console.log(iterationData);
+                iterations = iterationData.iterations;
+            } else {
+                iterations = 0;
+            }
             currentTime = 0;
             const now = performance.now();
-            startTime = continueFromLast ? performance.now() - lastTime : now;
+            startTime = continueFromLast ? now - (iterationData.currentTime * 1000) : now;
         },
-        get: () => currentTime,
+        get: () => ({iterations, currentTime}),
     };
 }
 
@@ -37,7 +42,7 @@ function initGridCellBox(x, y) {
 }
 
 function run(eventData) {
-    const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, lastTime, lastGrid, iterations, drawEveryNIterations} = eventData;
+    const {size, diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterationData, lastGrid, iterations, drawEveryNIterations} = eventData;
 
     const laplacian0 = 0.05;
     const laplacian1 = 0.2;
@@ -122,13 +127,13 @@ function run(eventData) {
         [gridTo, gridFrom] = [gridFrom, gridTo];
     }
 
-    iterationTracker.start(continueFrom, lastTime);
+    iterationTracker.start(continueFrom, iterationData);
 
-    for(let i = 0; i < iterations; i++) {
-        if(i % drawEveryNIterations === 0) {
+    for(let i = 0; i <= iterations; i++) {
+        if(i % drawEveryNIterations === 0 || i === iterations - 1) {
             postMessage({
                 type: 'grid',
-                currentTime: iterationTracker.get(),
+                iterationData: iterationTracker.get(),
                 grid: gridFrom,
             });
         }
@@ -136,6 +141,7 @@ function run(eventData) {
         iterationTracker.increment();
     }
     postMessage({type: 'complete'});
+    close();
 }
 
 onmessage = function(event) {

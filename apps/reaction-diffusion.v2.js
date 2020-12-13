@@ -18,7 +18,7 @@ const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 const data = new Uint32Array(imageData.data.buffer);
 
 let lastGrid = null;
-let lastTime = 0;
+let iterationData = 0;
 let worker = null;
 
 function getWorker() {
@@ -31,7 +31,7 @@ function getWorker() {
                 break;
             case 'grid':
                 draw(event.data.grid);
-                lastTime = event.data.currentTime;
+                iterationData = event.data.iterationData;
                 lastGrid = event.data.grid;
                 break;
             case 'complete':
@@ -81,6 +81,7 @@ window.onload = function() {
         worker.terminate();
     });
     restoreDefaultValues();
+    Main(true);
 };
 
 function draw(result) {
@@ -118,7 +119,7 @@ function Main(generate = false) {
         continueFrom: continueCheckboxEl.checked,
         iterations: round(sliders.SlideIterations.value),
         drawEveryNIterations: round(sliders.SlideDrawEveryNIterations.value),
-        lastTime,
+        iterationData,
         lastGrid,
     };
 
