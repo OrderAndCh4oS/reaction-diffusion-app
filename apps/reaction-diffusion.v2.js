@@ -15,8 +15,7 @@ canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-const imageArr = imageData.data;
-
+const data = new Uint32Array(imageData.data.buffer);
 
 let lastGrid = null;
 let lastTime = 0;
@@ -88,16 +87,24 @@ function draw(result) {
     for(let x = 0; x < canvas.width; x++) {
         for(let y = 0; y < canvas.height; y++) { //This is crude code to make the point
             count++;
-            const resultX = ~~(x/scale); // ~~ bitwise floor
-            const resultY = ~~(y/scale);
-            imageArr[x * canvas.width + y] = result[resultX][resultY].a * 255;
-            imageArr[x * canvas.width + y + 1] = result[resultX][resultY].a * 255;
-            imageArr[x * canvas.width + y + 2] = (1 - result[resultX][resultY].b) * 255;
-            imageArr[x * canvas.width + y + 3] = 255; //The alpha channel
+            const resultX = ~~(x / scale); // ~~ bitwise floor
+            const resultY = ~~(y / scale);
+            const rg = (result[resultX][resultY].a * 255) & 0xff;
+            const b = ((1 - result[resultX][resultY].b) * 255) & 0xff;
+
+            data[x * canvas.width + y] = (255 << 24) |    // alpha
+                (b << 16) |    // blue
+                (rg << 8) |    // green
+                rg;            // red;
+            // data[x * canvas.width + y] = result[resultX][resultY].a * 255;
+            // data[x * canvas.width + y + 1] = result[resultX][resultY].a * 255;
+            // data[x * canvas.width + y + 2] = (1 - result[resultX][resultY].b) * 255;
+            // data[x * canvas.width + y + 3] = 255; //The alpha channel
         }
     }
 
     context.putImageData(imageData, 0, 0);
+
     // for(let x = 1; x < result.length - 1; x++) {
     //     for(let y = 1; y < result[x].length - 1; y++) {
     //         context.fillStyle = `rgb(${result[x][y].a * 255}, ${result[x][y].a * 255}, ${(1 -
