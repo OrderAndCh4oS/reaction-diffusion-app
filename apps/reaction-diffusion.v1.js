@@ -19,6 +19,7 @@ let lastGrid = null;
 function makeIterationTracker(element) {
     let iteration = -1;
     let startTime;
+    let lastTime;
     return {
         increment: () => {
             iteration++;
@@ -28,8 +29,9 @@ function makeIterationTracker(element) {
                 element.value = "t=" + secs.toFixed(1) + "s Itn=" + iteration + " IPS=" + IPS.toFixed(1);
             }
         },
-        start: () => {
-            startTime = performance.now();
+        start: (continueFromLast) => {
+            const now = performance.now();
+            startTime = continueFromLast ? performance.now() - lastTime : now;
             iteration = 0;
             element.value = iteration;
         }
@@ -51,8 +53,11 @@ function makeGenerateButtonState(button, defaultInnerHtml, generatingInnerHtml) 
     });
 }
 
-const generateButtonState = makeGenerateButtonState(generateButtonEl, 'Generate',
-    `Processing<span class="loading"></span>`);
+const generateButtonState = makeGenerateButtonState(
+    generateButtonEl,
+    'Generate',
+    `Processing<span class="loading"></span>`
+);
 
 const round = (value, precision) => {
     const multiplier = Math.pow(10, precision || 0);
@@ -120,20 +125,30 @@ function Main(generate = false) {
     }, 50);
 }
 
+function initGridCellBox(x, y) {
+    if((x >= 40 * 2.5 && x <= 60 * 2.5) && (y >= 40 * 2.5 && y <= 60 * 2.5)) {
+        return {a: 0, b: 1};
+    }
+    return {a: 1, b: 0};
+}
+
+const laplacian0 = 0.05;
+const laplacian1 = 0.2;
+const laplacian2 = 0.05;
+const laplacian3 = 0.2;
+const laplacian4 = -1;
+const laplacian5 = 0.2;
+const laplacian6 = 0.05;
+const laplacian7 = 0.2;
+const laplacian8 = 0.05;
+
+
 //Here's the app calculation
 //The inputs are just the names provided - their order in the curly brackets is unimportant!
 //By convention the input values are provided with the correct units within Main
 async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, deltaTime, continueFrom, iterations, drawEveryNIterations}) {
-    console.log('here');
     const gridWidth = size;
     const gridHeight = size;
-
-    function initGridCellBox(x, y) {
-        if((x >= 40 * 2.5 && x <= 60 * 2.5) && (y >= 40 * 2.5 && y <= 60 * 2.5)) {
-            return {a: 0, b: 1};
-        }
-        return {a: 1, b: 0};
-    }
 
     let gridFrom, gridTo;
 
@@ -146,12 +161,6 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
     gridTo = [...Array(gridWidth)].map((_, x) => [...Array(gridHeight)].map((_, y) => ({a: null, b: null})));
 
     const killPlusFeed = killRate + feedRate;
-
-    const laplacianMatrix = [
-        [0.05, 0.2, 0.05],
-        [0.2, -1, 0.2],
-        [0.05, 0.2, 0.05],
-    ];
 
     function getA(a, aDiffusion, b) {
         return a + ((diffusionRateA * aDiffusion) - (a * b * b) + (feedRate * (1 - a))) * deltaTime;
@@ -170,25 +179,25 @@ async function CalcIt({diffusionRateA, diffusionRateB, feedRate, killRate, delta
                 const left = y > 0 ? y - 1 : gridFrom[x].length - 1;
                 const right = y < gridFrom[x].length - 1 ? y + 1 : 0;
 
-                let aDiffusion = gridFrom[top][left].a * laplacianMatrix[0][0];
-                aDiffusion += gridFrom[top][y].a * laplacianMatrix[0][1];
-                aDiffusion += gridFrom[top][right].a * laplacianMatrix[0][2];
-                aDiffusion += gridFrom[x][left].a * laplacianMatrix[1][0];
-                aDiffusion += gridFrom[x][y].a * laplacianMatrix[1][1];
-                aDiffusion += gridFrom[x][right].a * laplacianMatrix[1][2];
-                aDiffusion += gridFrom[bottom][left].a * laplacianMatrix[2][0];
-                aDiffusion += gridFrom[bottom][y].a * laplacianMatrix[2][1];
-                aDiffusion += gridFrom[bottom][right].a * laplacianMatrix[2][2];
+                let aDiffusion = gridFrom[top][left].a * laplacian0;
+                aDiffusion += gridFrom[top][y].a * laplacian1;
+                aDiffusion += gridFrom[top][right].a * laplacian2;
+                aDiffusion += gridFrom[x][left].a * laplacian3;
+                aDiffusion += gridFrom[x][y].a * laplacian4;
+                aDiffusion += gridFrom[x][right].a * laplacian5;
+                aDiffusion += gridFrom[bottom][left].a * laplacian6;
+                aDiffusion += gridFrom[bottom][y].a * laplacian7;
+                aDiffusion += gridFrom[bottom][right].a * laplacian8;
 
-                let bDiffusion = gridFrom[top][left].b * laplacianMatrix[0][0];
-                bDiffusion += gridFrom[top][y].b * laplacianMatrix[0][1];
-                bDiffusion += gridFrom[top][right].b * laplacianMatrix[0][2];
-                bDiffusion += gridFrom[x][left].b * laplacianMatrix[1][0];
-                bDiffusion += gridFrom[x][y].b * laplacianMatrix[1][1];
-                bDiffusion += gridFrom[x][right].b * laplacianMatrix[1][2];
-                bDiffusion += gridFrom[bottom][left].b * laplacianMatrix[2][0];
-                bDiffusion += gridFrom[bottom][y].b * laplacianMatrix[2][1];
-                bDiffusion += gridFrom[bottom][right].b * laplacianMatrix[2][2];
+                let bDiffusion = gridFrom[top][left].b * laplacian0;
+                bDiffusion += gridFrom[top][y].b * laplacian1;
+                bDiffusion += gridFrom[top][right].b * laplacian2;
+                bDiffusion += gridFrom[x][left].b * laplacian3;
+                bDiffusion += gridFrom[x][y].b * laplacian4;
+                bDiffusion += gridFrom[x][right].b * laplacian5;
+                bDiffusion += gridFrom[bottom][left].b * laplacian6;
+                bDiffusion += gridFrom[bottom][y].b * laplacian7;
+                bDiffusion += gridFrom[bottom][right].b * laplacian8;
 
                 const a = gridFrom[x][y].a;
                 const b = gridFrom[x][y].b;
