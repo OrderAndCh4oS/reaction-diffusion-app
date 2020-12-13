@@ -86,28 +86,38 @@ function run(eventData) {
                 const left = y > 0 ? y - 1 : gridFrom[x].length - 1;
                 const right = y < gridFrom[x].length - 1 ? y + 1 : 0;
 
-                let aDiffusion = gridFrom[top][left].a * laplacian0;
-                aDiffusion += gridFrom[top][y].a * laplacian1;
-                aDiffusion += gridFrom[top][right].a * laplacian2;
-                aDiffusion += gridFrom[x][left].a * laplacian3;
-                aDiffusion += gridFrom[x][y].a * laplacian4;
-                aDiffusion += gridFrom[x][right].a * laplacian5;
-                aDiffusion += gridFrom[bottom][left].a * laplacian6;
-                aDiffusion += gridFrom[bottom][y].a * laplacian7;
-                aDiffusion += gridFrom[bottom][right].a * laplacian8;
+                const gridCell0 = gridFrom[top][left];
+                const gridCell1 = gridFrom[top][y];
+                const gridCell2 = gridFrom[top][right];
+                const gridCell3 = gridFrom[x][left];
+                const gridCell4 = gridFrom[x][y];
+                const gridCell5 = gridFrom[x][right];
+                const gridCell6 = gridFrom[bottom][left];
+                const gridCell7 = gridFrom[bottom][y];
+                const gridCell8 = gridFrom[bottom][right];
 
-                let bDiffusion = gridFrom[top][left].b * laplacian0;
-                bDiffusion += gridFrom[top][y].b * laplacian1;
-                bDiffusion += gridFrom[top][right].b * laplacian2;
-                bDiffusion += gridFrom[x][left].b * laplacian3;
-                bDiffusion += gridFrom[x][y].b * laplacian4;
-                bDiffusion += gridFrom[x][right].b * laplacian5;
-                bDiffusion += gridFrom[bottom][left].b * laplacian6;
-                bDiffusion += gridFrom[bottom][y].b * laplacian7;
-                bDiffusion += gridFrom[bottom][right].b * laplacian8;
+                let aDiffusion = gridCell0.a * laplacian0;
+                aDiffusion += gridCell1.a * laplacian1;
+                aDiffusion += gridCell2.a * laplacian2;
+                aDiffusion += gridCell3.a * laplacian3;
+                aDiffusion += gridCell4.a * laplacian4;
+                aDiffusion += gridCell5.a * laplacian5;
+                aDiffusion += gridCell6.a * laplacian6;
+                aDiffusion += gridCell7.a * laplacian7;
+                aDiffusion += gridCell8.a * laplacian8;
 
-                const a = gridFrom[x][y].a;
-                const b = gridFrom[x][y].b;
+                let bDiffusion = gridCell0.b * laplacian0;
+                bDiffusion += gridCell1.b * laplacian1;
+                bDiffusion += gridCell2.b * laplacian2;
+                bDiffusion += gridCell3.b * laplacian3;
+                bDiffusion += gridCell4.b * laplacian4;
+                bDiffusion += gridCell5.b * laplacian5;
+                bDiffusion += gridCell6.b * laplacian6;
+                bDiffusion += gridCell7.b * laplacian7;
+                bDiffusion += gridCell8.b * laplacian8;
+
+                const a = gridCell4.a;
+                const b = gridCell4.b;
 
                 gridTo[x][y].a = getA(a, aDiffusion, b);
                 gridTo[x][y].b = getB(b, bDiffusion, a);
