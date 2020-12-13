@@ -128,12 +128,8 @@ function Main(generate = false) {
 }
 
 function CalcIt(data) {
-    if(!worker) {
-        worker = getWorker();
-    } else {
-        worker.terminate();
-        worker = getWorker();
-    }
+    if(worker) worker.terminate();
+    worker = getWorker();
     worker.postMessage({
         type: 'start',
         data: JSON.stringify(data),
