@@ -15,8 +15,7 @@ function makeIterationTracker() {
                 const iterationsPerSec = iteration / secs;
                 postMessage({
                     type: 'iter',
-                    str: `t=${secs.toFixed(1)}s Itn=${iteration} IPS=${iterationsPerSec.toFixed(
-                        1)}`,
+                    str: `t=${secs.toFixed(1)}s Itn=${iteration} IPS=${iterationsPerSec.toFixed(1)}`,
                 });
             }
         },
