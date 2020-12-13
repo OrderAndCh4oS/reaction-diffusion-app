@@ -93,14 +93,15 @@ function run(eventData) {
                 const gridCell6 = gridFrom[bottom][left];
                 const gridCell7 = gridFrom[bottom][y];
                 const gridCell8 = gridFrom[bottom][right];
-                const midCellA = gridCell4.a;
-                const midCellB = gridCell4.b;
+
+                const a = gridCell4.a;
+                const b = gridCell4.b;
 
                 let aDiffusion = gridCell0.a * laplacian0;
                 aDiffusion += gridCell1.a * laplacian1;
                 aDiffusion += gridCell2.a * laplacian2;
                 aDiffusion += gridCell3.a * laplacian3;
-                aDiffusion += midCellA * laplacian4;
+                aDiffusion += a * laplacian4;
                 aDiffusion += gridCell5.a * laplacian5;
                 aDiffusion += gridCell6.a * laplacian6;
                 aDiffusion += gridCell7.a * laplacian7;
@@ -110,14 +111,11 @@ function run(eventData) {
                 bDiffusion += gridCell1.b * laplacian1;
                 bDiffusion += gridCell2.b * laplacian2;
                 bDiffusion += gridCell3.b * laplacian3;
-                bDiffusion += midCellB * laplacian4;
+                bDiffusion += b * laplacian4;
                 bDiffusion += gridCell5.b * laplacian5;
                 bDiffusion += gridCell6.b * laplacian6;
                 bDiffusion += gridCell7.b * laplacian7;
                 bDiffusion += gridCell8.b * laplacian8;
-
-                const a = midCellA;
-                const b = midCellB;
 
                 gridTo[x][y].a = getA(a, aDiffusion, b);
                 gridTo[x][y].b = getB(b, bDiffusion, a);
