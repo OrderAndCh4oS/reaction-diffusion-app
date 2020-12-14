@@ -2,8 +2,8 @@
 
 function makeIterationTracker() {
     let startTime;
-    let iterations;
-    let currentTime;
+    let iterations = 0;
+    let currentTime = 0;
     return {
         increment: () => {
             iterations++;
@@ -18,11 +18,9 @@ function makeIterationTracker() {
             }
         },
         start: (continueFromLast, iterationData) => {
-            if (continueFromLast && iterationData) {
-                iterations = iterationData.iterations;
-            } else {
-                iterations = 0;
-            }
+            iterations = continueFromLast && iterationData
+                ? iterationData.iterations
+                : 0
             currentTime = 0;
             const now = performance.now();
             startTime = continueFromLast ? now - (iterationData.currentTime * 1000) : now;
@@ -55,6 +53,7 @@ function initGridCellCircle(size, x, y) {
     }
     return {a: 1, b: 0};
 }
+
 function makeBlobInit(size, count, radius) {
     const blobs = [];
     const innerScale = 1 - radius * 2.5;
