@@ -14,7 +14,7 @@ canvas.width = size * scale;
 canvas.height = size * scale;
 context.scale(scale, scale);
 let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-let data = new Uint32Array(imageData.data.buffer);
+let image = new Uint32Array(imageData.data.buffer);
 
 let lastGrid = null;
 let iterationData = 0;
@@ -90,7 +90,7 @@ window.onresize = function() {
     canvas.height = size * scale;
     context.scale(scale, scale);
     imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    data = new Uint32Array(imageData.data.buffer);
+    image = new Uint32Array(imageData.data.buffer);
 }
 
 function draw(result) {
@@ -103,7 +103,7 @@ function draw(result) {
             const rg = (result[resultX][resultY].a * 255) & 0xff;
             const b = ((1 - result[resultX][resultY].b) * 255) & 0xff;
 
-            data[x * canvas.width + y] = (255 << 24) |    // alpha
+            image[x * canvas.width + y] = (255 << 24) |    // alpha
                 (b << 16) |    // blue
                 (rg << 8) |    // green
                 rg;            // red;

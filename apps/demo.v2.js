@@ -53,18 +53,18 @@ function CalcIt({linVal, logVal, multiplier, useOne, useBoth}) {
         xval = 3 * i;
         y1 = multiplier * linVal * Math.sin(logVal * xval / 50);
         y2 = multiplier * linVal * Math.cos(logVal * xval / 50);
-        //All graph data consists of x:xval, y:yval pairs in curly brackets
-        //Pushed onto the plot data
+        //All graph image consists of x:xval, y:yval pairs in curly brackets
+        //Pushed onto the plot image
         plotOne.push({x: xval, y: y1});
         plotTwo.push({x: xval, y: y2});
     }
 
-     //Now set up all the graphing data.
+     //Now set up all the graphing image.
     //We use the amazing Open Source Chart.js, https://www.chartjs.org/
     //A lot of the sophistication is addressed directly here
     //But if you need something more, read the Chart.js documentation or search Stack Overflow
 
-    //Usually we can put these directly into the graph data
+    //Usually we can put these directly into the graph image
     //But they depend on the setup in this example
     let plotData = [], lineLabels = []
     //Code to set up the variables to go into the plot
@@ -83,7 +83,7 @@ function CalcIt({linVal, logVal, multiplier, useOne, useBoth}) {
         }
     }
 
-   //Now set up all the graphing data detail by detail.
+   //Now set up all the graphing image detail by detail.
     const prmap = {
         plotData: plotData, //An array of 1 or more datasets
         lineLabels: lineLabels, //An array of labels for each dataset
