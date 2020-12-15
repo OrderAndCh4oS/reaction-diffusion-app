@@ -204,10 +204,9 @@ function run(eventData) {
 }
 
 onmessage = function(event) {
-    const data = JSON.parse(event.data.data)
     switch(event.data.type) {
         case 'start':
-            run(data);
+            run(event.data.data);
             break;
         default:
             console.log('Unhandled event type', event);

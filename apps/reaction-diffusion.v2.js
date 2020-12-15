@@ -143,7 +143,7 @@ function CalcIt(data) {
     worker = getWorker();
     worker.postMessage({
         type: 'start',
-        data: JSON.stringify(data),
+        data,
     });
 }
 

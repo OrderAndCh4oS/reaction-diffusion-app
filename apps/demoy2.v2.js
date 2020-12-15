@@ -1,4 +1,4 @@
-//One universal basic required here to get things going once loaded
+//One universal basic required here to stop things going once loaded
 window.onload = function () {
     //We need to set up buttons in this onload section
     document.getElementById('ClickMe').onclick = function () {
